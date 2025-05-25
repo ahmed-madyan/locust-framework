@@ -1,22 +1,14 @@
-from locust import LoadTestShape, HttpUser, task, between
-from typing import Optional, Tuple
-from load_shaper.LoadProfileFactory import LoadProfileFactory
-from request_builder.RequestBuilder import RequestBuilder
-from reponse_validator.ResponseValidator import ResponseValidator
-from config import PARAMETERS, STATUS_CODES, HTTP_METHODS, BASE_PATHS, HEADERS, LOAD_SHAPER_CONFIG, SCHEMAS, \
+from locust import HttpUser, task, between
+
+from config import PARAMETERS, STATUS_CODES, HTTP_METHODS, BASE_PATHS, HEADERS, SCHEMAS, \
     SERVICE_BASE_URI
+from simulations.base.base_load_shape import BaseLoadShape
+from simulations.base.base_user import BaseTaskSet
 
 
-class MyUser(HttpUser):
+class MyUser(BaseTaskSet):
     host = SERVICE_BASE_URI["REQ_RES_BASE_URI"]
     wait_time = between(1, 2)
-
-    def on_start(self, host=None):
-        """Initialize any user-specific data when the user starts."""
-        self.request_builder = RequestBuilder(self)
-        # Set the host URL once during initialization
-        self.request_builder.with_host(self.host)
-        self.validator = ResponseValidator()
 
     @task
     def get_users(self):
@@ -45,39 +37,11 @@ class MyUser(HttpUser):
         #     print(response.content)
 
 
-class CustomLoadShape(LoadTestShape):
-    """
-    A custom load shape that implements a complex load pattern using multiple phases:
-    - Initial spike
-    - Ramp up
-    - Steady state
-    - Stress test
-    """
+class CustomLoadShape(BaseLoadShape):
+    pass
 
-    def __init__(self) -> None:
-        """Initialize the load shape with predefined phases."""
-        super().__init__()
-        config = LOAD_SHAPER_CONFIG
-        self.phases = LoadProfileFactory() \
-            .spike(config["INITIAL_SPIKE_USERS"]) \
-            .build()
-            # .ramp_up(config["RAMP_UP_USERS"], config["RAMP_UP_DURATION"]) \
-            # .steady_users(config["STEADY_USERS"], config["STEADY_DURATION"]) \
-            # .stress_ramp(config["STRESS_START_USERS"], config["STRESS_END_USERS"], config["STRESS_DURATION"]) \
-            # .build()
 
-    def tick(self) -> Optional[Tuple[int, float]]:
-        """
-        Calculate the number of users and spawn rate for the current time.
-
-        Returns:
-            Optional[Tuple[int, float]]: A tuple of (user_count, spawn_rate) or None if no phase is active
-        """
-        run_time = self.get_run_time()
-
-        for phase in self.phases:
-            user_count = phase.user_count_at(run_time)
-            if user_count is not None:
-                return (user_count, phase.spawn_rate)
-
-        return None
+class UserClass(HttpUser):
+    host = SERVICE_BASE_URI["REQ_RES_BASE_URI"]
+    wait_time = between(1, 2)
+    tasks = [MyUser]
