@@ -1,3 +1,16 @@
+"""
+ResponseValidator module for validating HTTP responses in a fluent interface style.
+This module provides a comprehensive validation framework for HTTP responses, supporting:
+- Status code validation
+- Header validation
+- JSON path validation
+- JSON schema validation
+- Custom validation functions
+
+The validator uses a fluent interface pattern to chain multiple validations together
+and provides detailed validation results with logging.
+"""
+
 from typing import Any, Dict, List, Optional, Union, Callable
 from locust.clients import HttpSession
 import json
@@ -7,14 +20,28 @@ from jsonschema import validate
 from logger import logger
 
 class ValidationType(Enum):
-    STATUS_CODE = "status_code"
-    HEADER = "header"
-    JSON_PATH = "json_path"
-    JSON_SCHEMA = "json_schema"
-    CUSTOM = "custom"
+    """
+    Enumeration of supported validation types.
+    Each type represents a different way to validate a response.
+    """
+    STATUS_CODE = "status_code"  # Validate HTTP status code
+    HEADER = "header"           # Validate response headers
+    JSON_PATH = "json_path"     # Validate specific JSON paths
+    JSON_SCHEMA = "json_schema" # Validate against JSON schema
+    CUSTOM = "custom"          # Custom validation functions
 
 @dataclass
 class ValidationResult:
+    """
+    Data class representing the result of a single validation.
+    
+    Attributes:
+        is_valid (bool): Whether the validation passed
+        message (str): Description of the validation result
+        expected (Any): The expected value
+        actual (Any): The actual value from the response
+        validation_type (ValidationType): The type of validation performed
+    """
     is_valid: bool
     message: str
     expected: Any
@@ -22,8 +49,26 @@ class ValidationResult:
     validation_type: ValidationType
 
 class ResponseValidator:
+    """
+    A fluent interface validator for HTTP responses.
+    
+    This class provides a chainable API for validating different aspects of HTTP responses.
+    It supports multiple validation types and provides detailed validation results.
+    
+    Example usage:
+        validator = ResponseValidator()
+        results = (validator
+            .expect_status_code(200)
+            .expect_header("Content-Type", "application/json")
+            .expect_json_schema(user_schema)
+            .validate(response))
+    """
+    
     def __init__(self):
-        """Initialize the ResponseValidator."""
+        """
+        Initialize the ResponseValidator.
+        Creates empty lists for validations and custom validators.
+        """
         self._validations: List[Dict[str, Any]] = []
         self._custom_validators: Dict[str, Callable] = {}
         logger.debug("ResponseValidator initialized")
@@ -34,6 +79,9 @@ class ResponseValidator:
         
         Args:
             status_code: Expected status code or list of acceptable status codes
+            
+        Returns:
+            ResponseValidator: The validator instance for method chaining
         """
         self._validations.append({
             'type': ValidationType.STATUS_CODE,
@@ -49,6 +97,9 @@ class ResponseValidator:
         Args:
             header_name: Name of the header to validate
             expected_value: Expected header value
+            
+        Returns:
+            ResponseValidator: The validator instance for method chaining
         """
         self._validations.append({
             'type': ValidationType.HEADER,
@@ -65,6 +116,9 @@ class ResponseValidator:
         Args:
             json_path: JSON path expression (e.g., 'data.user.name')
             expected_value: Expected value at the JSON path
+            
+        Returns:
+            ResponseValidator: The validator instance for method chaining
         """
         self._validations.append({
             'type': ValidationType.JSON_PATH,
@@ -80,6 +134,9 @@ class ResponseValidator:
         
         Args:
             schema: JSON schema to validate against
+            
+        Returns:
+            ResponseValidator: The validator instance for method chaining
         """
         self._validations.append({
             'type': ValidationType.JSON_SCHEMA,
@@ -95,6 +152,9 @@ class ResponseValidator:
         Args:
             name: Name of the custom validator
             validator_func: Function that takes a response and returns a boolean
+            
+        Returns:
+            ResponseValidator: The validator instance for method chaining
         """
         self._custom_validators[name] = validator_func
         self._validations.append({
@@ -108,11 +168,18 @@ class ResponseValidator:
         """
         Validate the response against all configured validations.
         
+        This method:
+        1. Iterates through all configured validations
+        2. Performs each validation based on its type
+        3. Creates a ValidationResult for each validation
+        4. Logs the results
+        5. Returns a list of all validation results
+        
         Args:
             response: The response to validate
             
         Returns:
-            List of validation results
+            List[ValidationResult]: List of validation results for each validation performed
         """
         logger.info("Starting response validation", 
                    status_code=response.status_code,
@@ -246,27 +313,34 @@ class ResponseValidator:
         """
         Assert that all validations pass, raising an AssertionError if any fail.
         
+        This method:
+        1. Runs all validations
+        2. Collects any failed validations
+        3. Raises an AssertionError with details if any validations failed
+        
         Args:
             response: The response to validate
             
         Raises:
-            AssertionError: If any validation fails
+            AssertionError: If any validation fails, with details about the failures
         """
         results = self.validate(response)
-        failed_validations = [r for r in results if not r.is_valid]
+        failed_results = [r for r in results if not r.is_valid]
         
-        if failed_validations:
-            error_messages = [f"{r.validation_type.value}: {r.message}" for r in failed_validations]
-            error_msg = "\n".join(error_messages)
-            logger.error("Validation assertion failed", 
-                        failed_count=len(failed_validations),
-                        errors=error_messages)
-            raise AssertionError(error_msg)
-        
-        logger.info("All validations passed")
+        if failed_results:
+            error_messages = [r.message for r in failed_results]
+            raise AssertionError(f"Response validation failed:\n" + "\n".join(error_messages))
 
     def reset(self) -> 'ResponseValidator':
-        """Reset all validations."""
+        """
+        Reset all validations to their initial state.
+        
+        This method is useful when you want to reuse the validator for a new response
+        without creating a new instance.
+        
+        Returns:
+            ResponseValidator: The validator instance for method chaining
+        """
         self._validations = []
         self._custom_validators = {}
         logger.debug("ResponseValidator reset")
