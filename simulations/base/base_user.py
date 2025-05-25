@@ -1,9 +1,9 @@
-from locust import TaskSet
+from locust import SequentialTaskSet
 from request_builder.RequestBuilder import RequestBuilder
 from reponse_validator.ResponseValidator import ResponseValidator
 
 
-class BaseTaskSet(TaskSet):
+class BaseTaskSet(SequentialTaskSet):
     """Base class for all TaskSet implementations that provides common initialization logic."""
     
     def __init__(self, *args, **kwargs):
