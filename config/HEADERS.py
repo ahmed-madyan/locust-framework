@@ -11,7 +11,7 @@ REQ_RES_API_KEY_HEADERS = {
 
 # Authentication Headers
 AUTH_HEADERS = {
-    "Authorization": "Bearer {token}"  # Template for token-based auth
+    "Authorization": "Bearer "  # Template for token-based auth
 }
 
 # Custom Headers
