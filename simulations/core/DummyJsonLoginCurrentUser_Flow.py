@@ -7,8 +7,6 @@ from simulations.base.base_user import BaseTaskSet
 
 
 class MyUserSet(BaseTaskSet):
-    host = SERVICE_BASE_URI["DUMMY_JSON_BASE_URI"]
-    wait_time = between(1, 2)
 
     @task(1)
     def dummy_json_login(self):
