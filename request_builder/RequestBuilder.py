@@ -1,16 +1,16 @@
 from typing import Dict, Any, Optional, Union
-from locust import HttpUser, task
+from locust import HttpUser, User, TaskSet, SequentialTaskSet
 import json
 from urllib.parse import urljoin
 from logger import logger
 
 class RequestBuilder:
-    def __init__(self, client: HttpUser):
+    def __init__(self, client: Union[User, HttpUser, TaskSet, SequentialTaskSet]):
         """
-        Initialize the RequestBuilder with a Locust HttpUser client.
+        Initialize the RequestBuilder with a Locust client.
         
         Args:
-            client (HttpUser): The Locust HttpUser instance to make requests with
+            client (Union[User, HttpUser, TaskSet, SequentialTaskSet]): The Locust client instance to make requests with
         """
         self.client = client
         self._headers: Dict[str, str] = {}
@@ -75,6 +75,12 @@ class RequestBuilder:
         self._name = name
         logger.debug("Request name set", name=name)
         return self
+
+    def _get_http_client(self):
+        """Get the HTTP client from the appropriate source."""
+        if isinstance(self.client, (TaskSet, SequentialTaskSet)):
+            return self.client.user.client
+        return self.client.client
 
     def _log_response(self, response: Any) -> None:
         """Log detailed response information."""
@@ -148,18 +154,21 @@ class RequestBuilder:
                    has_data=self._data is not None)
 
         try:
+            # Get the appropriate HTTP client
+            http_client = self._get_http_client()
+            
             # Execute the request based on the method
             method = self._method.lower()
             if method == "get":
-                response = self.client.client.get(full_url, **kwargs)
+                response = http_client.get(full_url, **kwargs)
             elif method == "post":
-                response = self.client.client.post(full_url, **kwargs)
+                response = http_client.post(full_url, **kwargs)
             elif method == "put":
-                response = self.client.client.put(full_url, **kwargs)
+                response = http_client.put(full_url, **kwargs)
             elif method == "delete":
-                response = self.client.client.delete(full_url, **kwargs)
+                response = http_client.delete(full_url, **kwargs)
             elif method == "patch":
-                response = self.client.client.patch(full_url, **kwargs)
+                response = http_client.patch(full_url, **kwargs)
             else:
                 error_msg = f"Unsupported HTTP method: {method}"
                 logger.error(error_msg)
