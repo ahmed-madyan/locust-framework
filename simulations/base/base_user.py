@@ -7,10 +7,6 @@ from config import SERVICE_BASE_URI
 class BaseTaskSet(SequentialTaskSet):
     """Base class for all TaskSet implementations that provides common initialization logic."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.bearer_token = None
-
     def on_start(self):
         """Initialize any user-specific data when the user starts."""
         self.request_builder = RequestBuilder(self)
