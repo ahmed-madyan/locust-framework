@@ -5,8 +5,15 @@ from request_payloads.core.DummyJsonPayloads import DummyJsonPayloads
 from simulations.base.base_load_shape import BaseLoadShape
 from simulations.base.base_user import BaseTaskSet
 
+bearer_token = ""
+
 
 class MyUserSet(BaseTaskSet):
+    """Define Global Variables."""
+
+    def __init__(self):
+        """Define Global Variables."""
+        self.bearer_token = ""
 
     @task(1)
     def dummy_json_login(self):
