@@ -25,7 +25,7 @@ jobs:
         
     - name: Run Locust Test
       run: |
-        locust -f ./simulations/core/DummyJsonLoginCurrentUser_Flow.py
+        locust -f ./simulations/core/DummyJsonLoginCurrentUser_Flow.py --headless
         
     - name: Upload test results
       if: always()
