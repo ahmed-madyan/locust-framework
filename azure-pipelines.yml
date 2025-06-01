@@ -1,0 +1,73 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - '**/*.py'
+      - 'requirements.txt'
+      - 'azure-pipelines.yml'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  pythonVersion: '3.9'
+
+stages:
+- stage: Build
+  displayName: 'Build and Test'
+  jobs:
+  - job: BuildAndTest
+    displayName: 'Build and Test'
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+        addToPath: true
+
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      displayName: 'Install dependencies'
+
+    - script: |
+        python -m pytest UnitTest.py -v
+      displayName: 'Run tests'
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'pytest'
+        testResultsFiles: '**/test-results.xml'
+        failTaskOnFailedTests: true
+      condition: succeededOrFailed()
+
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '**/coverage.xml'
+        reportDirectory: '**/coverage'
+      condition: succeededOrFailed()
+
+- stage: Package
+  displayName: 'Package'
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - job: Package
+    displayName: 'Package Application'
+    steps:
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container' 
