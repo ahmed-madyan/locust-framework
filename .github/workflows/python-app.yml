@@ -34,4 +34,4 @@ jobs:
         name: test-results
         path: |
           logs/
-          reports/ 
+          reports/
