@@ -1,0 +1,23 @@
+import os
+
+BASIC = {
+    "INITIAL_SPIKE_USERS": 1,
+    "RAMP_UP_USERS": 20,
+    "RAMP_UP_DURATION": 10
+}
+
+STRESS = {
+    "INITIAL_SPIKE_USERS": 5,
+    "RAMP_UP_USERS": 50,
+    "RAMP_UP_DURATION": 20,
+    "STEADY_USERS": 30,
+    "STEADY_DURATION": 30
+}
+
+ENDURANCE = {
+    "INITIAL_SPIKE_USERS": 1,
+    "RAMP_UP_USERS": 10,
+    "RAMP_UP_DURATION": 30,
+    "STEADY_USERS": 10,
+    "STEADY_DURATION": 3600  # 1 hour
+}
