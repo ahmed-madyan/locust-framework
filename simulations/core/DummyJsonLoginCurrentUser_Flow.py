@@ -4,7 +4,7 @@ from reponse_validator.ResponseValidator import ResponseValidator
 from request_payloads.core.DummyJsonPayloads import DummyJsonPayloads
 from simulations.base.base_load_shape import BaseLoadShape
 from simulations.base.base_user import BaseTaskSet
-from config import BaseURI, BasePath, RequestMethod, StatusCode, HEADERS
+from config import BaseURI, BasePath, RequestMethod, StatusCode, Headers
 
 
 class MyUserSet(BaseTaskSet):
@@ -18,7 +18,7 @@ class MyUserSet(BaseTaskSet):
         response = (self.request_builder
                     .with_url(BasePath.DUMMY_JSON_LOGIN)
                     .with_method(RequestMethod.POST)
-                    .with_headers(HEADERS["COMMON_HEADERS"])
+                    .with_headers(Headers.COMMON_HEADERS)
                     .with_json(DummyJsonPayloads.LOGIN_PAYLOAD)
                     .with_name("Dummy Json Login")
                     .execute())
