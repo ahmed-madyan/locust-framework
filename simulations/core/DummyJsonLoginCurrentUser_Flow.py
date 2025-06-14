@@ -3,11 +3,11 @@ from locust import HttpUser, task, between
 from reponse_validator.ResponseValidator import ResponseValidator
 from request_payloads.core.DummyJsonPayloads import DummyJsonPayloads
 from simulations.base.base_load_shape import BaseLoadShape
-from simulations.base.base_user import BaseTaskSet
+from simulations.base.base_user import SequentialBaseTaskSet
 from config import BaseURI, BasePath, RequestMethod, StatusCode, Headers
 
 
-class MyUserSet(BaseTaskSet):
+class MyUserSet(SequentialBaseTaskSet):
     """Define Global Static Variables."""
     bearer_token = ""
 

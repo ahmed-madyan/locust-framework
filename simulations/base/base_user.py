@@ -4,7 +4,7 @@ from reponse_validator.ResponseValidator import ResponseValidator
 from config import BaseURI
 
 
-class BaseTaskSet(SequentialTaskSet):
+class SequentialBaseTaskSet(SequentialTaskSet):
     """Base class for all TaskSet implementations that provides common initialization logic."""
 
     def on_start(self):
