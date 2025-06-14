@@ -1,9 +1,10 @@
 from locust import HttpUser, task, between
 
-from config import HTTP_METHODS, BASE_PATHS, HEADERS, SERVICE_BASE_URI
+from reponse_validator.ResponseValidator import ResponseValidator
 from request_payloads.core.DummyJsonPayloads import DummyJsonPayloads
 from simulations.base.base_load_shape import BaseLoadShape
 from simulations.base.base_user import BaseTaskSet
+from config import BaseURI, BasePath, RequestMethod, StatusCode, Headers
 
 
 class MyUserSet(BaseTaskSet):
@@ -15,13 +16,15 @@ class MyUserSet(BaseTaskSet):
         """Example task to get users."""
         # Build and execute request using configuration
         response = (self.request_builder
-                    .with_url(BASE_PATHS["DUMMY_JSON_LOGIN"])
-                    .with_method(HTTP_METHODS["POST"])
-                    .with_headers(HEADERS["COMMON_HEADERS"])
+                    .with_url(BasePath.DUMMY_JSON_LOGIN)
+                    .with_method(RequestMethod.POST)
+                    .with_headers(Headers.COMMON_HEADERS)
                     .with_json(DummyJsonPayloads.LOGIN_PAYLOAD)
                     .with_name("Dummy Json Login")
                     .execute())
         self.bearer_token = response.json().get("accessToken")
+        validator = ResponseValidator().expect_status_code(StatusCode.OK)
+        validator.validate(response)
         print(f"Bearer token: {self.bearer_token}")
 
     @task(2)
@@ -29,8 +32,8 @@ class MyUserSet(BaseTaskSet):
         """Example task to get users."""
         # Build and execute request using configuration
         response = (self.request_builder
-                    .with_url(BASE_PATHS["DUMMY_JSON_CURRENT_AUTH_USER"])
-                    .with_method(HTTP_METHODS["GET"])
+                    .with_url(BasePath.DUMMY_JSON_CURRENT_AUTH_USER)
+                    .with_method(RequestMethod.GET)
                     .with_headers({"Authorization": f"Bearer {self.bearer_token}"})
                     .with_name("Dummy Json current user")
                     .execute())
@@ -41,6 +44,6 @@ class CustomLoadShape(BaseLoadShape):
 
 
 class MyUser(HttpUser):
-    host = SERVICE_BASE_URI["DUMMY_JSON_BASE_URI"]
+    host = BaseURI.REQ_RES_BASE_URI
     wait_time = between(1, 5)
     tasks = [MyUserSet]

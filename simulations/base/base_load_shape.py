@@ -1,7 +1,7 @@
 from locust import LoadTestShape
 from typing import Optional, Tuple
 from load_shaper.LoadProfileFactory import LoadProfileFactory
-from config import LOAD_SHAPER_CONFIG
+from config import LoadShaperConfig
 
 
 class BaseLoadShape(LoadTestShape):
@@ -17,12 +17,11 @@ class BaseLoadShape(LoadTestShape):
     def __init__(self) -> None:
         """Initialize the load shape with predefined phases."""
         super().__init__()
-        config = LOAD_SHAPER_CONFIG
         self.phases = LoadProfileFactory() \
-            .spike(config["INITIAL_SPIKE_USERS"]) \
-            .ramp_up(config["RAMP_UP_USERS"], config["RAMP_UP_DURATION"]) \
-            .steady_users(config["STEADY_USERS"], config["STEADY_DURATION"]) \
-            .stress_ramp(config["STRESS_START_USERS"], config["STRESS_END_USERS"], config["STRESS_DURATION"]) \
+            .spike(LoadShaperConfig.INITIAL_SPIKE_USERS) \
+            .ramp_up(LoadShaperConfig.RAMP_UP_USERS, LoadShaperConfig.RAMP_UP_DURATION) \
+            .steady_users(LoadShaperConfig.STEADY_USERS, LoadShaperConfig.STEADY_DURATION) \
+            .stress_ramp(LoadShaperConfig.STRESS_START_USERS, LoadShaperConfig.STRESS_END_USERS, LoadShaperConfig.STRESS_DURATION) \
             .build()
 
     def tick(self) -> Optional[Tuple[int, float]]:
@@ -39,4 +38,4 @@ class BaseLoadShape(LoadTestShape):
             if user_count is not None:
                 return (user_count, phase.spawn_rate)
 
-        return None 
+        return None
