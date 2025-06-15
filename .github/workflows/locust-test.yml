@@ -51,7 +51,7 @@ jobs:
         
     - name: Run Locust Test
       run: |
-        locust -f ./simulations/core/DummyJsonLoginCurrentUser_Flow.py --headless
+        locust -f ./simulations/core/DummyJsonLoginCurrentUser_Flow.py --headless --html=locust-report.html --json=locust-report.json
       continue-on-error: true
       
     - name: Configure Grafana
@@ -86,8 +86,8 @@ jobs:
       with:
         name: locust-report
         path: |
-          locust-report.xml
           locust-report.html
+          locust-report.json
           
     - name: Upload Grafana Screenshot
       if: always()
