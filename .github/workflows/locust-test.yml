@@ -84,23 +84,19 @@ jobs:
       
     - name: Capture Grafana Screenshot
       run: |
-        python -c '
-from playwright.sync_api import sync_playwright
-import time
-
-with sync_playwright() as p:
-    browser = p.chromium.launch()
-    page = browser.new_page()
-    page.goto("http://localhost:3000/login")
-    page.fill("input[name=username]", "admin")
-    page.fill("input[name=password]", "admin")
-    page.click("button[type=submit]")
-    time.sleep(5)  # Wait for login
-    page.goto("http://localhost:3000/d/11985/locust-dashboard")
-    time.sleep(10)  # Wait for dashboard to load
-    page.screenshot(path="grafana-screenshot.png")
-    browser.close()
-        '
+        python -c 'from playwright.sync_api import sync_playwright; import time; \
+        with sync_playwright() as p: \
+            browser = p.chromium.launch(); \
+            page = browser.new_page(); \
+            page.goto("http://localhost:3000/login"); \
+            page.fill("input[name=username]", "admin"); \
+            page.fill("input[name=password]", "admin"); \
+            page.click("button[type=submit]"); \
+            time.sleep(5); \
+            page.goto("http://localhost:3000/d/11985/locust-dashboard"); \
+            time.sleep(10); \
+            page.screenshot(path="grafana-screenshot.png"); \
+            browser.close()'
       
     - name: Upload test results
       if: always()
