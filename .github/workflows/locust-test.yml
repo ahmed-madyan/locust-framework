@@ -231,8 +231,7 @@ jobs:
       
     - name: Create screenshot script
       run: |
-        cat > capture_screenshot.py << 'EOL'
-from playwright.sync_api import sync_playwright
+        echo 'from playwright.sync_api import sync_playwright
 import time
 
 def capture_screenshot():
@@ -250,8 +249,7 @@ def capture_screenshot():
         browser.close()
 
 if __name__ == "__main__":
-    capture_screenshot()
-EOL
+    capture_screenshot()' > capture_screenshot.py
       
     - name: Capture Grafana Screenshot
       run: python capture_screenshot.py
