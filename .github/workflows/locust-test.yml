@@ -240,9 +240,7 @@ jobs:
             page.fill("input[name=password]", "admin"); \
             page.click("button[type=submit]"); \
             time.sleep(5); \
-            page.goto("http://localhost:3000/dashboards"); \
-            time.sleep(5); \
-            page.click("a[href*=\"/d/\"]"); \
+            page.goto("http://localhost:3000/d/c10e3d52-cc2e-461c-8a07-63e8278b2960/locust-load-test-dashboard"); \
             time.sleep(10); \
             page.screenshot(path="grafana-screenshot.png"); \
             browser.close()'
