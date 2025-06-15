@@ -45,6 +45,20 @@ jobs:
         cd monitoring
         docker-compose up -d
         
+    - name: Wait for Grafana
+      run: |
+        echo "Waiting for Grafana to be ready..."
+        for i in {1..30}; do
+          if curl -s http://localhost:3000/api/health | grep -q "ok"; then
+            echo "Grafana is ready!"
+            exit 0
+          fi
+          echo "Attempt $i: Grafana not ready yet..."
+          sleep 10
+        done
+        echo "Grafana failed to start within the timeout period"
+        exit 1
+        
     - name: Start Locust Exporter
       run: |
         cd monitoring
@@ -58,9 +72,6 @@ jobs:
       
     - name: Configure Grafana
       run: |
-        # Wait for Grafana to be ready
-        sleep 30
-        
         # Add Prometheus data source
         curl -X POST http://admin:admin@localhost:3000/api/datasources \
           -H "Content-Type: application/json" \
