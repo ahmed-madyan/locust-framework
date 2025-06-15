@@ -71,13 +71,160 @@ jobs:
             "access": "proxy"
           }'
         
-        # Import dashboard
-        curl -X POST http://admin:admin@localhost:3000/api/dashboards/import \
+        # Create custom dashboard
+        curl -X POST http://admin:admin@localhost:3000/api/dashboards/db \
           -H "Content-Type: application/json" \
           -d '{
             "dashboard": {
-              "id": 11985,
-              "title": "Locust Dashboard"
+              "id": null,
+              "title": "Locust Load Test Dashboard",
+              "tags": ["locust", "load-testing", "performance"],
+              "timezone": "browser",
+              "schemaVersion": 30,
+              "version": 0,
+              "refresh": "5s",
+              "panels": [
+                {
+                  "title": "Current Users",
+                  "type": "gauge",
+                  "datasource": "Prometheus",
+                  "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+                  "fieldConfig": {
+                    "defaults": {
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {"color": "green", "value": null},
+                          {"color": "yellow", "value": 50},
+                          {"color": "red", "value": 100}
+                        ]
+                      }
+                    }
+                  },
+                  "targets": [
+                    {
+                      "expr": "locust_users_current",
+                      "legendFormat": "Users"
+                    }
+                  ]
+                },
+                {
+                  "title": "User Spawn Rate",
+                  "type": "gauge",
+                  "datasource": "Prometheus",
+                  "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+                  "fieldConfig": {
+                    "defaults": {
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {"color": "green", "value": null},
+                          {"color": "yellow", "value": 5},
+                          {"color": "red", "value": 10}
+                        ]
+                      }
+                    }
+                  },
+                  "targets": [
+                    {
+                      "expr": "locust_users_spawn_rate",
+                      "legendFormat": "Users/sec"
+                    }
+                  ]
+                },
+                {
+                  "title": "Response Times",
+                  "type": "graph",
+                  "datasource": "Prometheus",
+                  "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+                  "targets": [
+                    {
+                      "expr": "locust_response_time_percentile{percentile=\"95\"}",
+                      "legendFormat": "95th Percentile"
+                    },
+                    {
+                      "expr": "locust_response_time_percentile{percentile=\"50\"}",
+                      "legendFormat": "Median"
+                    },
+                    {
+                      "expr": "locust_response_time_percentile{percentile=\"99\"}",
+                      "legendFormat": "99th Percentile"
+                    }
+                  ]
+                },
+                {
+                  "title": "Request Rate",
+                  "type": "graph",
+                  "datasource": "Prometheus",
+                  "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+                  "targets": [
+                    {
+                      "expr": "rate(locust_requests_total[1m])",
+                      "legendFormat": "Requests/sec"
+                    }
+                  ]
+                },
+                {
+                  "title": "Failure Rate",
+                  "type": "graph",
+                  "datasource": "Prometheus",
+                  "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+                  "targets": [
+                    {
+                      "expr": "rate(locust_failures_total[1m])",
+                      "legendFormat": "Failures/sec"
+                    }
+                  ]
+                },
+                {
+                  "title": "Response Time Distribution",
+                  "type": "heatmap",
+                  "datasource": "Prometheus",
+                  "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+                  "targets": [
+                    {
+                      "expr": "sum(rate(locust_response_time_buckets[1m])) by (le)",
+                      "legendFormat": "{{le}}"
+                    }
+                  ]
+                },
+                {
+                  "title": "Request Status Codes",
+                  "type": "piechart",
+                  "datasource": "Prometheus",
+                  "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+                  "targets": [
+                    {
+                      "expr": "sum(locust_requests_total) by (status)",
+                      "legendFormat": "{{status}}"
+                    }
+                  ]
+                },
+                {
+                  "title": "Response Time by Endpoint",
+                  "type": "bargauge",
+                  "datasource": "Prometheus",
+                  "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+                  "targets": [
+                    {
+                      "expr": "locust_response_time_percentile{percentile=\"95\"}",
+                      "legendFormat": "{{name}}"
+                    }
+                  ]
+                },
+                {
+                  "title": "Failure Rate by Endpoint",
+                  "type": "bargauge",
+                  "datasource": "Prometheus",
+                  "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+                  "targets": [
+                    {
+                      "expr": "rate(locust_failures_total[1m])",
+                      "legendFormat": "{{name}}"
+                    }
+                  ]
+                }
+              ]
             },
             "overwrite": true
           }'
@@ -93,7 +240,9 @@ jobs:
             page.fill("input[name=password]", "admin"); \
             page.click("button[type=submit]"); \
             time.sleep(5); \
-            page.goto("http://localhost:3000/d/11985/locust-dashboard"); \
+            page.goto("http://localhost:3000/dashboards"); \
+            time.sleep(5); \
+            page.click("a[href*=\"/d/\"]"); \
             time.sleep(10); \
             page.screenshot(path="grafana-screenshot.png"); \
             browser.close()'
