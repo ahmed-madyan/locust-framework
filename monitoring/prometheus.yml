@@ -1,11 +1,8 @@
 global:
-  scrape_interval: 60s
-remote_write:
-  - url: https://prometheus-prod-53-prod-me-central-1.grafana.net/api/prom/push
-    basic_auth:
-      username: 2501839
-      password: glc_eyJvIjoiMTQ1ODA3NCIsIm4iOiJzdGFjay0xMjg4ODAyLWFsbG95LWxvY3V0cy1wcm9tZXRoZXVzLWdyYWZhbmEiLCJrIjoibTY1OFZtMDJna2FrVkJwTmMwOHA1QzkyIiwibSI6eyJyIjoicHJvZC1tZS1jZW50cmFsLTEifX0=
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
 scrape_configs:
-  - job_name: node
+  - job_name: 'locust'
     static_configs:
-      - targets: ["localhost:8000"]
+      - targets: ['localhost:9646']  # Default locust_exporter port 

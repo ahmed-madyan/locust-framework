@@ -6,3 +6,4 @@ typing-extensions
 prometheus-client
 python-dotenv
 beautifulsoup4
+locust-exporter
