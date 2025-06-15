@@ -3,7 +3,6 @@ jsonschema
 requests
 urllib3
 typing-extensions
-prometheus-client
+prometheus_client
 python-dotenv
 beautifulsoup4
-locust-exporter

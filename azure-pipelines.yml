@@ -50,9 +50,41 @@ stages:
         reportDirectory: '**/coverage'
       condition: succeededOrFailed()
 
+- stage: LoadTest
+  displayName: 'Load Test'
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - job: RunLocustTest
+    displayName: 'Run Locust Test'
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+        addToPath: true
+
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      displayName: 'Install dependencies'
+
+    - script: |
+        locust -f ./simulations/core/DummyJsonLoginCurrentUser_Flow.py --headless --users 10 --spawn-rate 1 --run-time 1m
+      displayName: 'Run Locust Test'
+      continueOnError: true
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/locust-report.xml'
+        failTaskOnFailedTests: false
+      condition: succeededOrFailed()
+
 - stage: Package
   displayName: 'Package'
-  dependsOn: Build
+  dependsOn: 
+    - Build
+    - LoadTest
   condition: succeeded()
   jobs:
   - job: Package

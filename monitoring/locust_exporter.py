@@ -4,9 +4,9 @@ import time
 import json
 
 # Metrics
-USERS = Gauge('locust_users', 'Number of users')
-REQUESTS_PER_SECOND = Gauge('locust_requests_per_second', 'Requests per second')
-FAILURES_PER_SECOND = Gauge('locust_failures_per_second', 'Failures per second')
+USERS = Gauge('locust_users_current', 'Number of users')
+REQUESTS_PER_SECOND = Gauge('locust_requests_current', 'Requests per second')
+FAILURES_PER_SECOND = Gauge('locust_failures_current', 'Failures per second')
 RESPONSE_TIME_PERCENTILE = Gauge('locust_response_time_percentile', 'Response time percentile', ['percentile'])
 
 def fetch_metrics(locust_host):
