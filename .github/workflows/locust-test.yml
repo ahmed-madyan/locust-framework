@@ -25,7 +25,8 @@ jobs:
           - 9090:9090
         volumes:
           - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-        args: ["--config.file=/etc/prometheus/prometheus.yml"]
+        options: >-
+          --config.file=/etc/prometheus/prometheus.yml
           
       grafana:
         image: grafana/grafana:latest
@@ -34,7 +35,8 @@ jobs:
         env:
           GF_SECURITY_ADMIN_USER: admin
           GF_SECURITY_ADMIN_PASSWORD: admin
-        options: --network=host
+        options: >-
+          --network=host
           
     steps:
     - uses: actions/checkout@v4
