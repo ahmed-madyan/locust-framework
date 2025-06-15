@@ -1,19 +1,65 @@
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError
 import time
+import sys
+
+def wait_for_grafana(page, max_retries=5, retry_delay=10):
+    """Wait for Grafana to be ready by checking the login page."""
+    for attempt in range(max_retries):
+        try:
+            print(f"Attempt {attempt + 1}/{max_retries} to connect to Grafana...")
+            page.goto("http://localhost:3000/login", timeout=30000)
+            # Wait for the login form to be visible
+            page.wait_for_selector("input[name=username]", timeout=10000)
+            print("Grafana login page is ready!")
+            return True
+        except TimeoutError as e:
+            print(f"Attempt {attempt + 1} failed: {str(e)}")
+            if attempt < max_retries - 1:
+                print(f"Waiting {retry_delay} seconds before next attempt...")
+                time.sleep(retry_delay)
+            else:
+                print("Max retries reached. Grafana might not be ready.")
+                return False
 
 def capture_screenshot():
     with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
-        page.goto("http://localhost:3000/login")
-        page.fill("input[name=username]", "admin")
-        page.fill("input[name=password]", "admin")
-        page.click("button[type=submit]")
-        time.sleep(5)
-        page.goto("http://localhost:3000/d/c10e3d52-cc2e-461c-8a07-63e8278b2960/locust-load-test-dashboard")
-        time.sleep(10)
-        page.screenshot(path="grafana-screenshot.png")
-        browser.close()
+        try:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            
+            # Wait for Grafana to be ready
+            if not wait_for_grafana(page):
+                print("Failed to connect to Grafana. Exiting...")
+                sys.exit(1)
+            
+            # Login to Grafana
+            print("Logging into Grafana...")
+            page.fill("input[name=username]", "admin")
+            page.fill("input[name=password]", "admin")
+            page.click("button[type=submit]")
+            
+            # Wait for login to complete
+            print("Waiting for login to complete...")
+            time.sleep(5)
+            
+            # Navigate to dashboard
+            print("Navigating to dashboard...")
+            page.goto("http://localhost:3000/d/c10e3d52-cc2e-461c-8a07-63e8278b2960/locust-load-test-dashboard")
+            
+            # Wait for dashboard to load
+            print("Waiting for dashboard to load...")
+            time.sleep(10)
+            
+            # Take screenshot
+            print("Taking screenshot...")
+            page.screenshot(path="grafana-screenshot.png")
+            print("Screenshot saved successfully!")
+            
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
+            sys.exit(1)
+        finally:
+            browser.close()
 
 if __name__ == "__main__":
     capture_screenshot() 
