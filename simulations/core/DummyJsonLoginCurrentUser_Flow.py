@@ -1,4 +1,4 @@
-from locust import HttpUser, task, between
+from locust import HttpUser, task, between, tag
 
 from reponse_validator.ResponseValidator import ResponseValidator
 from request_payloads.core.DummyJsonPayloads import DummyJsonPayloads
@@ -12,6 +12,7 @@ class MyUserSet(SequentialBaseTaskSet):
     bearer_token = ""
 
     @task(1)
+    @tag("Critical")
     def dummy_json_login(self):
         """Example task to get users."""
         # Build and execute request using configuration
@@ -28,6 +29,7 @@ class MyUserSet(SequentialBaseTaskSet):
         print(f"Bearer token: {self.bearer_token}")
 
     @task(2)
+    @tag("Critical")
     def dummy_json_current_user(self):
         """Example task to get users."""
         # Build and execute request using configuration
