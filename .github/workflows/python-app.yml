@@ -29,7 +29,7 @@ jobs:
       - name: Run Locust Test
         run: |
           locust --config locust.conf
-          #        locust -f ./simulations/core/DummyJsonLoginCurrentUser_Flow.py --headless --html
+          #        locust -f ./simulations/core/DummyJsonLoginCurrentUser_Flow.py --headless --html reports/results.html
 
       - name: Upload test results
         if: always()
@@ -39,3 +39,4 @@ jobs:
           path: |
             logs/
             reports/
+            reports/results.html
