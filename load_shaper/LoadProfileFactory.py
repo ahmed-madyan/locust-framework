@@ -18,10 +18,10 @@ class LoadProfileFactory:
     
     Example usage:
         profile = LoadProfileFactory() \
-            .spike(10) \                    # Initial spike of 10 users
-            .ramp_up(50, 30) \             # Ramp up to 50 users over 30 seconds
-            .steady_users(50, 60) \        # Maintain 50 users for 60 seconds
-            .stress_ramp(50, 100, 30) \    # Stress test from 50 to 100 users
+            .spike(10)                     # Initial spike of 10 users
+            .ramp_up(50, 30)              # Ramp up to 50 users over 30 seconds
+            .steady_users(50, 60)         # Maintain 50 users for 60 seconds
+            .stress_ramp(50, 100, 30)     # Stress test from 50 to 100 users
             .build()
     """
     
