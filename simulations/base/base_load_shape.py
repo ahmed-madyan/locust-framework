@@ -1,4 +1,4 @@
-from locust import LoadTestShape, events
+from locust import LoadTestShape
 from typing import Optional, Tuple
 from load_shaper.LoadProfileFactory import LoadProfileFactory
 from config import LoadShaperConfig
@@ -19,11 +19,10 @@ class BaseLoadShape(LoadTestShape):
         super().__init__()
         self.phases = LoadProfileFactory() \
             .spike(LoadShaperConfig.INITIAL_SPIKE_USERS) \
+            .ramp_up(LoadShaperConfig.RAMP_UP_USERS, LoadShaperConfig.RAMP_UP_DURATION) \
+            .steady_users(LoadShaperConfig.STEADY_USERS, LoadShaperConfig.STEADY_DURATION) \
+            .stress_ramp(LoadShaperConfig.STRESS_START_USERS, LoadShaperConfig.STRESS_END_USERS, LoadShaperConfig.STRESS_DURATION) \
             .build()
-            # .ramp_up(LoadShaperConfig.RAMP_UP_USERS, LoadShaperConfig.RAMP_UP_DURATION) \
-            # .steady_users(LoadShaperConfig.STEADY_USERS, LoadShaperConfig.STEADY_DURATION) \
-            # .stress_ramp(LoadShaperConfig.STRESS_START_USERS, LoadShaperConfig.STRESS_END_USERS, LoadShaperConfig.STRESS_DURATION) \
-            # .build()
 
     def tick(self) -> Optional[Tuple[int, float]]:
         """
@@ -40,9 +39,3 @@ class BaseLoadShape(LoadTestShape):
                 return (user_count, phase.spawn_rate)
 
         return None
-
-
-# Register the shape class with Locust
-@events.init.add_listener
-def on_locust_init(environment, **kwargs):
-    environment.shape_class = BaseLoadShape
