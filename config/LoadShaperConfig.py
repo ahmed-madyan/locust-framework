@@ -1,6 +1,6 @@
 import os
 
-INITIAL_SPIKE_USERS = int(os.environ.get("INITIAL_SPIKE_USERS", 1))
+INITIAL_SPIKE_USERS = int(os.environ.get("INITIAL_SPIKE_USERS", 2))
 RAMP_UP_USERS = int(os.environ.get("RAMP_UP_USERS", 20))
 RAMP_UP_DURATION = int(os.environ.get("RAMP_UP_DURATION", 10))
 STEADY_USERS = int(os.environ.get("STEADY_USERS", 5))
