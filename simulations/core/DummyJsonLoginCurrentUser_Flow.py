@@ -29,7 +29,7 @@ class MyUserSet(SequentialBaseTaskSet):
         print(f"Bearer token: {self.bearer_token}")
 
     @task(2)
-    @tag("Critical")
+    # @tag("Critical")
     def dummy_json_current_user(self):
         """Example task to get users."""
         # Build and execute request using configuration
