@@ -13,17 +13,26 @@ class BaseLoadShape(LoadTestShape):
     - Steady state
     - Stress test
     """
+    _instance = None
+    _initialized = False
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(BaseLoadShape, cls).__new__(cls)
+        return cls._instance
 
     def __init__(self) -> None:
         """Initialize the load shape with predefined phases."""
-        super().__init__()
-        self.phases = LoadProfileFactory() \
-            .spike(LoadShaperConfig.INITIAL_SPIKE_USERS) \
-            .build()
+        if not self._initialized:
+            super().__init__()
+            self.phases = LoadProfileFactory() \
+                .spike(LoadShaperConfig.INITIAL_SPIKE_USERS) \
+                .build()
             # .ramp_up(LoadShaperConfig.RAMP_UP_USERS, LoadShaperConfig.RAMP_UP_DURATION) \
             # .steady_users(LoadShaperConfig.STEADY_USERS, LoadShaperConfig.STEADY_DURATION) \
             # .stress_ramp(LoadShaperConfig.STRESS_START_USERS, LoadShaperConfig.STRESS_END_USERS, LoadShaperConfig.STRESS_DURATION) \
             # .build()
+            self._initialized = True
 
     def tick(self) -> Optional[Tuple[int, float]]:
         """
