@@ -23,4 +23,3 @@ def track_request(request_type, name, response_time, response_length, exception,
     else:
         REQUEST_FAILURE_COUNT.inc()
     REQUEST_LATENCY.observe(response_time / 1000.0)  # Convert ms to seconds
- 
