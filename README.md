@@ -2,48 +2,71 @@
 
 A powerful and flexible framework for load testing and performance testing built on top of Locust. This framework provides a structured approach to creating, managing, and executing load tests with advanced features for request building, response validation, and load shaping.
 
+---
+
+## Table of Contents
+- [Installation](#installation)
+- [Features](#features)
+- [Usage](#usage)
+  - [Basic Example](#basic-example)
+  - [Load Profile Example](#load-profile-example)
+- [Project Structure](#project-structure)
+- [Configuration](#configuration)
+- [Logging](#logging)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
+---
+
+## Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/locust-framework.git
+   cd locust-framework
+   ```
+
+2. **Create and activate a virtual environment:**
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+---
+
 ## Features
 
-- **Request Builder**: Fluent API for building HTTP requests with support for all HTTP methods, headers, parameters, and body data
-- **Response Validator**: Comprehensive response validation including status codes, headers, JSON schema, and custom validations
-- **Load Shaper**: Advanced load profile management with support for:
+- **Request Builder:** Fluent API for building HTTP requests with support for all HTTP methods, headers, parameters, and body data.
+- **Response Validator:** Comprehensive response validation including status codes, headers, JSON schema, and custom validations.
+- **Load Shaper:** Advanced load profile management with support for:
   - Spike testing
   - Ramp-up scenarios
   - Steady-state testing
   - Stress testing
-- **Logging Framework**: Detailed logging with:
+- **Logging Framework:** Detailed logging with:
   - Colored console output
   - Rotating file logs
   - Multiple log levels
   - Contextual information
 
-## Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/locust-framework.git
-cd locust-framework
-```
-
-2. Create and activate a virtual environment:
-```bash
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+---
 
 ## Usage
 
 ### Basic Example
 
+This example demonstrates how to use the framework to build and validate a simple GET request.
+
 ```python
 from locust import HttpUser, task, between
 from request_builder import RequestBuilder
-from reponse_validator import ResponseValidator
+from response_validator import ResponseValidator
 from load_shaper import LoadProfileFactory
 
 class MyUser(HttpUser):
@@ -75,6 +98,8 @@ class MyUser(HttpUser):
 
 ### Load Profile Example
 
+This example shows how to define a custom load profile for your test.
+
 ```python
 from load_shaper import LoadProfileFactory
 
@@ -87,33 +112,40 @@ load_profile = LoadProfileFactory() \
     .build()
 ```
 
+---
+
 ## Project Structure
 
 ```
 locust-framework/
-├── logger/                 # Logging framework
-├── request_builder/        # Request building utilities
-├── reponse_validator/      # Response validation tools
-├── load_shaper/           # Load profile management
-└── config/                # Configuration files
+├── logger/               # Logging framework
+├── request_builder/      # Request building utilities
+├── response_validator/   # Response validation tools
+├── load_shaper/          # Load profile management
+└── config/               # Configuration files
 ```
+
+---
 
 ## Configuration
 
 The framework uses a modular configuration system. Key configuration files are located in the `config/` directory:
 
-- `SERVICE_BASE_URI.py`: Base URLs for services
-- `SCHEMAS.py`: JSON schemas for validation
-- `LOAD_SHAPER_CONFIG.py`: Load test configuration
-- `HEADERS.py`: Common headers
-- `BASE_PATHS.py`: API endpoints
-- `HTTP_METHODS.py`: HTTP method configurations
-- `STATUS_CODES.py`: HTTP status code definitions
-- `PARAMETERS.py`: Common request parameters
+- **BaseURI.py**: Defines base URLs for services.
+- **Schema.py**: Contains JSON schemas for response validation.
+- **LoadShaperConfig.py**: Load test configuration parameters.
+- **LoadProfiles.py**: Predefined load profiles for tests.
+- **Headers.py**: Common HTTP headers used in requests.
+- **BasePath.py**: API endpoint paths.
+- **RequestMethod.py**: Supported HTTP method configurations.
+- **StatusCode.py**: HTTP status code definitions.
+- **Parameters.py**: Common request parameters.
+
+---
 
 ## Logging
 
-The framework includes a comprehensive logging system:
+The framework includes a comprehensive logging system. Example usage:
 
 ```python
 from logger import logger
@@ -127,8 +159,10 @@ logger.critical("System crash imminent", reason="Memory overflow")
 ```
 
 Logs are written to both:
-- Console (with colors for different levels)
-- Rotating log files in the `logs/` directory
+- **Console** (with colors for different levels)
+- **Rotating log files** in the `logs/` directory
+
+---
 
 ## Contributing
 
@@ -138,9 +172,7 @@ Logs are written to both:
 4. Push to the branch
 5. Create a Pull Request
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
 
 ## Acknowledgments
 
